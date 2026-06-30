@@ -110,8 +110,8 @@ interface MessageThreadProps {
 
 function formatDateSeparator(dateStr: string): string {
   const date = new Date(dateStr);
-  if (isToday(date)) return "Today";
-  if (isYesterday(date)) return "Yesterday";
+  if (isToday(date)) return "Hoje";
+  if (isYesterday(date)) return "Ontem";
   return format(date, "MMMM d, yyyy");
 }
 
@@ -133,9 +133,9 @@ function groupMessagesByDate(messages: Message[]) {
 }
 
 const STATUS_OPTIONS: { label: string; value: ConversationStatus; color: string }[] = [
-  { label: "Open", value: "open", color: "text-primary" },
-  { label: "Pending", value: "pending", color: "text-amber-400" },
-  { label: "Closed", value: "closed", color: "text-muted-foreground" },
+  { label: "Aberta", value: "open", color: "text-primary" },
+  { label: "Pendente", value: "pending", color: "text-amber-400" },
+  { label: "Fechada", value: "closed", color: "text-muted-foreground" },
 ];
 
 /**
@@ -228,13 +228,13 @@ export function MessageThread({
       .reverse()
       .find((m) => m.sender_type === "customer");
 
-    if (!lastCustomerMsg) return { expired: true, remaining: "No customer messages" };
+    if (!lastCustomerMsg) return { expired: true, remaining: "Nenhuma mensagem do cliente" };
 
     const hoursSince = differenceInHours(new Date(), new Date(lastCustomerMsg.created_at));
     const expired = hoursSince >= 24;
 
     if (expired) {
-      return { expired: true, remaining: "Expired" };
+      return { expired: true, remaining: "Expirada" };
     }
 
     const hoursLeft = 24 - hoursSince;
@@ -504,7 +504,7 @@ export function MessageThread({
       // kinds use the caption as-is. Audio carries no caption.
       const contentText =
         payload.kind === "document"
-          ? payload.caption || payload.filename || "Document"
+          ? payload.caption || payload.filename || "Documento"
           : payload.caption;
 
       const tempId = `temp-${Date.now()}`;
@@ -669,7 +669,7 @@ export function MessageThread({
     return map;
   }, [reactions]);
 
-  const contactDisplayName = contact?.name || contact?.phone || "Customer";
+  const contactDisplayName = contact?.name || contact?.phone || "Cliente";
 
   // Author label for a quoted message: "You" when we sent the parent,
   // contact name when the customer sent it.
@@ -677,7 +677,7 @@ export function MessageThread({
     (m: Message): string => {
       const isAgentMsg =
         m.sender_type === "agent" || m.sender_type === "bot";
-      return isAgentMsg ? "You" : contactDisplayName;
+      return isAgentMsg ? "Você" : contactDisplayName;
     },
     [contactDisplayName],
   );
@@ -704,7 +704,7 @@ export function MessageThread({
         return;
       }
       if (messageId.startsWith("temp-")) {
-        toast.error("Wait for the message to finish sending");
+        toast.error("Aguarde o envio da mensagem");
         return;
       }
 
@@ -788,10 +788,10 @@ export function MessageThread({
           <MessageSquare className="h-8 w-8 text-muted-foreground" />
         </div>
         <h3 className="mt-4 text-sm font-medium text-muted-foreground">
-          Select a conversation
+          Selecione uma conversa
         </h3>
         <p className="mt-1 text-xs text-muted-foreground">
-          Choose a conversation from the left to start messaging
+          Escolha uma conversa à esquerda para começar
         </p>
       </div>
     );
@@ -805,8 +805,8 @@ export function MessageThread({
   const assignedAgentId = conversation.assigned_agent_id ?? null;
   const currentAssignee = profiles.find((p) => p.user_id === assignedAgentId);
   const assignLabel = assignedAgentId
-    ? (currentAssignee?.full_name ?? "Assigned")
-    : "Assign";
+    ? (currentAssignee?.full_name ?? "Atribuído")
+    : "Atribuir";
 
   return (
     // `min-w-0` is load-bearing: the page already puts min-w-0 on the
@@ -828,7 +828,7 @@ export function MessageThread({
             <button
               type="button"
               onClick={onBack}
-              aria-label="Back to conversations"
+              aria-label="Voltar para conversas"
               className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground lg:hidden"
             >
               <ArrowLeft className="h-5 w-5" />
@@ -894,7 +894,7 @@ export function MessageThread({
               onClick={handleRefreshClick}
               disabled={isRefreshing}
               aria-label="Refresh conversation"
-              title="Refresh"
+              title="Atualizar"
               className={cn(
                 "inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-60",
               )}
@@ -948,7 +948,7 @@ export function MessageThread({
             >
               {profiles.length === 0 ? (
                 <DropdownMenuItem disabled className="text-sm text-muted-foreground">
-                  No teammates available
+                  Nenhum membro disponível
                 </DropdownMenuItem>
               ) : (
                 profiles.map((p) => {
@@ -974,7 +974,7 @@ export function MessageThread({
                       />
                       <span className="flex-1">
                         {p.full_name}
-                        {p.user_id === user?.id ? " (me)" : ""}
+                        {p.user_id === user?.id ? " (eu)" : ""}
                       </span>
                       {isSelected && <Check className="ml-2 h-3 w-3" />}
                     </DropdownMenuItem>
@@ -988,7 +988,7 @@ export function MessageThread({
                     onClick={() => handleAssignChange(null)}
                     className="text-sm text-muted-foreground"
                   >
-                    Unassign
+                    Desatribuir
                   </DropdownMenuItem>
                 </>
               )}
@@ -1007,7 +1007,7 @@ export function MessageThread({
           <div className="flex flex-col items-center justify-center py-12">
             <p className="text-sm text-muted-foreground">No messages yet</p>
             <p className="text-xs text-muted-foreground">
-              Send a template to start the conversation
+              Envie um modelo para iniciar a conversa
             </p>
           </div>
         ) : (

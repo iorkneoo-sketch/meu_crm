@@ -37,11 +37,11 @@ import { GatedButton } from "@/components/ui/gated-button";
 
 // Spec-defined seed — name and color per the product spec.
 const SPEC_DEFAULT_STAGES = [
-  { name: "New Lead", color: "#3b82f6", position: 0 }, // blue
-  { name: "Qualified", color: "#eab308", position: 1 }, // yellow
-  { name: "Proposal Sent", color: "#f97316", position: 2 }, // orange
-  { name: "Negotiation", color: "#8b5cf6", position: 3 }, // purple
-  { name: "Won", color: "#22c55e", position: 4 }, // green
+  { name: "Novo Lead", color: "#3b82f6", position: 0 }, // blue
+  { name: "Qualificado", color: "#eab308", position: 1 }, // yellow
+  { name: "Proposta Enviada", color: "#f97316", position: 2 }, // orange
+  { name: "Negociação", color: "#8b5cf6", position: 3 }, // purple
+  { name: "Ganho", color: "#22c55e", position: 4 }, // green
 ];
 
 export default function PipelinesPage() {
@@ -323,7 +323,7 @@ export default function PipelinesPage() {
             >
               <GitBranch className="h-4 w-4 text-primary" />
               <span className="font-semibold">
-                {selectedPipeline?.name ?? "Select Pipeline"}
+                {selectedPipeline?.name ?? "Selecionar Pipeline"}
               </span>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </DropdownMenuTrigger>
@@ -333,7 +333,7 @@ export default function PipelinesPage() {
             >
               {pipelines.length === 0 && (
                 <DropdownMenuItem disabled className="text-muted-foreground">
-                  No pipelines yet
+                  Nenhum pipeline ainda
                 </DropdownMenuItem>
               )}
               {pipelines.map((p) => (
@@ -357,7 +357,7 @@ export default function PipelinesPage() {
                   className="text-popover-foreground"
                 >
                   <Settings className="mr-2 h-3.5 w-3.5" />
-                  Manage Pipelines
+                  Gerenciar Pipelines
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>
@@ -373,7 +373,7 @@ export default function PipelinesPage() {
             className="border-border bg-card text-foreground hover:bg-muted"
           >
             <Plus className="mr-1 h-4 w-4" />
-            Add Pipeline
+            Adicionar Pipeline
           </GatedButton>
           <GatedButton
             canAct={canCreateDeals}
@@ -383,7 +383,7 @@ export default function PipelinesPage() {
             className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             <Plus className="mr-1 h-4 w-4" />
-            Add Deal
+            Adicionar Negócio
           </GatedButton>
         </div>
       </div>
@@ -396,7 +396,7 @@ export default function PipelinesPage() {
             No pipelines yet
           </h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            Create a pipeline to start tracking deals
+            Crie um pipeline para começar a acompanhar negócios
           </p>
           <GatedButton
             canAct={canEditSettings}
@@ -405,7 +405,7 @@ export default function PipelinesPage() {
             className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90"
           >
             <Plus className="mr-1 h-4 w-4" />
-            Create Pipeline
+            Criar Pipeline
           </GatedButton>
         </div>
       ) : (
@@ -425,14 +425,14 @@ export default function PipelinesPage() {
       <Dialog open={newPipelineOpen} onOpenChange={setNewPipelineOpen}>
         <DialogContent className="sm:max-w-sm bg-popover border-border">
           <DialogHeader>
-            <DialogTitle className="text-popover-foreground">New Pipeline</DialogTitle>
+            <DialogTitle className="text-popover-foreground">Novo Pipeline</DialogTitle>
           </DialogHeader>
           <div className="py-2">
-            <Label className="text-muted-foreground">Pipeline Name</Label>
+            <Label className="text-muted-foreground">Nome do Pipeline</Label>
             <Input
               value={newPipelineName}
               onChange={(e) => setNewPipelineName(e.target.value)}
-              placeholder="e.g., Enterprise Sales"
+              placeholder="ex.: Vendas Enterprise"
               className="mt-2 bg-muted border-border text-foreground"
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleCreatePipeline();
@@ -448,14 +448,14 @@ export default function PipelinesPage() {
               onClick={() => setNewPipelineOpen(false)}
               className="border-border text-muted-foreground hover:bg-muted"
             >
-              Cancel
+              Cancelar
             </Button>
             <Button
               onClick={handleCreatePipeline}
               disabled={creating || !newPipelineName.trim()}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              {creating ? "Creating..." : "Create Pipeline"}
+              {creating ? "Criando..." : "Criar Pipeline"}
             </Button>
           </DialogFooter>
         </DialogContent>

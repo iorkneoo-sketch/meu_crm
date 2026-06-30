@@ -70,24 +70,24 @@ export function DealsSettings() {
   return (
     <section className="max-w-2xl animate-in fade-in-50 duration-200">
       <SettingsPanelHead
-        title="Deals & currency"
-        description="The currency used for new deals and for pipeline and dashboard totals."
+        title="Negócios e moeda"
+        description="A moeda usada para novos negócios e para totais de pipeline e painel."
       />
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-foreground">
             <Coins className="size-4 text-primary" />
-            Default currency
+            Moeda padrão
           </CardTitle>
           <CardDescription className="text-muted-foreground">
-            New deals default to this currency, and pipeline and
-            dashboard totals are shown in it. Existing deals keep the
-            currency they were saved with.
+            Novos negócios usam esta moeda, e os totais do pipeline e
+            painel são exibidos nela. Negócios existentes mantêm a
+            moeda com que foram salvos.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-2 sm:max-w-xs">
-            <Label className="text-muted-foreground">Currency</Label>
+            <Label className="text-muted-foreground">Moeda</Label>
             <select
               value={selected}
               onChange={(e) => setSelected(e.target.value)}
@@ -102,7 +102,7 @@ export function DealsSettings() {
             </select>
             {!canEditSettings && (
               <p className="text-xs text-muted-foreground">
-                Only account admins can change the default currency.
+                Apenas administradores podem alterar a moeda padrão.
               </p>
             )}
           </div>
@@ -116,10 +116,10 @@ export function DealsSettings() {
               {saving ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
-                  Saving...
+                  Salvando...
                 </>
               ) : (
-                "Save"
+                "Salvar"
               )}
             </Button>
           )}

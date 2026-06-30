@@ -158,14 +158,14 @@ export function SettingsOverview({
       section: 'whatsapp',
       loading: whatsappLoading,
       subtitle: !whatsapp?.configured ? (
-        'Not set up yet'
+        'Não configurado'
       ) : whatsapp.connected ? (
         <>
-          <StatusDot tone="ok" /> Connected
+          <StatusDot tone="ok" /> Conectado
         </>
       ) : (
         <>
-          <StatusDot tone="muted" /> Needs reconnecting
+          <StatusDot tone="muted" /> Precisa reconectar
         </>
       ),
     },
@@ -174,7 +174,7 @@ export function SettingsOverview({
       loading: countsLoading,
       subtitle:
         counts?.members == null
-          ? 'View team members'
+          ? 'Ver membros da equipe'
           : `${counts.members} member${counts.members === 1 ? '' : 's'}${
               counts.pendingInvites
                 ? ` · ${counts.pendingInvites} pending invite${
@@ -188,7 +188,7 @@ export function SettingsOverview({
       loading: countsLoading,
       subtitle:
         counts?.templates == null
-          ? 'Manage message templates'
+          ? 'Gerenciar modelos'
           : `${counts.templates} template${counts.templates === 1 ? '' : 's'}${
               counts.templatesPending
                 ? ` · ${counts.templatesPending} pending review`
@@ -205,7 +205,7 @@ export function SettingsOverview({
       loading: countsLoading,
       subtitle:
         counts?.tags == null && counts?.customFields == null
-          ? 'Tags and custom fields'
+          ? 'Tags e campos personalizados'
           : `${counts?.tags ?? 0} tag${counts?.tags === 1 ? '' : 's'} · ${
               counts?.customFields ?? 0
             } custom field${counts?.customFields === 1 ? '' : 's'}`,
@@ -272,7 +272,7 @@ export function SettingsOverview({
                 <span className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
                   {loading ? (
                     <>
-                      <Loader2 className="size-3 animate-spin" /> Loading…
+                      <Loader2 className="size-3 animate-spin" /> Carregando…
                     </>
                   ) : (
                     subtitle

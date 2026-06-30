@@ -245,7 +245,7 @@ export function MessageComposer({
         removeStaged(draftRef.current?.path);
         setDraft({ kind, mediaUrl: publicUrl, path, filename: file.name, caption: "" });
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Upload failed.");
+        toast.error(err instanceof Error ? err.message : "Falha no upload.");
       } finally {
         setBusy(false);
       }
@@ -282,7 +282,7 @@ export function MessageComposer({
         removeStaged(draftRef.current?.path);
         setDraft({ kind: "audio", mediaUrl: publicUrl, path, filename: file.name, caption: "" });
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Upload failed.");
+        toast.error(err instanceof Error ? err.message : "Falha no upload.");
       } finally {
         setBusy(false);
       }
@@ -400,7 +400,7 @@ export function MessageComposer({
             onClick={onOpenTemplates}
           >
             <LayoutTemplate className="mr-1 h-3 w-3" />
-            Templates
+            Modelos
           </Button>
         </div>
       )}
@@ -459,7 +459,7 @@ export function MessageComposer({
             onClick={cancelRecording}
             className="rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-card hover:text-foreground"
           >
-            Cancel
+            Cancelar
           </button>
           <Button
             size="sm"
@@ -478,10 +478,10 @@ export function MessageComposer({
               disabled={inputsDisabled || busy}
               title={
                 readOnly
-                  ? "Read-only — your role can't send messages"
-                  : inputsDisabled
+                      ? "Somente leitura — seu cargo não pode enviar mensagens"
+                      : inputsDisabled
                     ? undefined
-                    : "Attach media"
+                    : "Anexar mídia"
               }
               className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md p-0 text-muted-foreground hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
             >
@@ -494,19 +494,19 @@ export function MessageComposer({
             <DropdownMenuContent align="start" className="border-border bg-popover">
               <DropdownMenuItem onClick={() => imageInputRef.current?.click()}>
                 <ImageIcon className="mr-2 h-4 w-4" />
-                Photo
+                Foto
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => videoInputRef.current?.click()}>
                 <Video className="mr-2 h-4 w-4" />
-                Video
+                Vídeo
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => documentInputRef.current?.click()}>
                 <FileText className="mr-2 h-4 w-4" />
-                Document
+                Documento
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => void startRecording()}>
                 <Mic className="mr-2 h-4 w-4" />
-                Voice note
+                Nota de voz
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -516,7 +516,7 @@ export function MessageComposer({
             size="sm"
             canAct={!readOnly}
             gateReason="send messages"
-            title={readOnly ? undefined : "Send template"}
+            title={readOnly ? undefined : "Enviar modelo"}
             className="h-9 w-9 shrink-0 p-0 text-muted-foreground hover:text-foreground"
             onClick={onOpenTemplates}
           >
@@ -530,17 +530,17 @@ export function MessageComposer({
             onKeyDown={handleKeyDown}
             placeholder={
               readOnly
-                ? "Read-only — viewers can browse but not reply"
+                ? "Somente leitura — visualizadores não podem responder"
                 : sessionExpired
-                  ? "Session expired - use a template"
-                  : "Type a message... (Shift+Enter for new line)"
+                  ? "Sessão expirada - use um modelo"
+                  : "Digite uma mensagem... (Shift+Enter para nova linha)"
             }
             disabled={sessionExpired || readOnly}
             rows={1}
             // Textarea keeps its own inline title — the GatedButton
             // wrapping pattern doesn't apply to non-button inputs.
             // The placeholder text also surfaces the read-only state.
-            title={readOnly ? "Read-only — your role can't send messages" : undefined}
+            title={readOnly ? "Somente leitura — seu cargo não pode enviar mensagens" : undefined}
             className={cn(
               "flex-1 resize-none rounded-xl border border-border bg-muted px-4 py-2.5 text-sm text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-primary/50",
               (sessionExpired || readOnly) && "cursor-not-allowed opacity-50"
@@ -640,7 +640,7 @@ function MediaDraftPreview({
                 onSend();
               }
             }}
-            placeholder="Add a caption…"
+            placeholder="Adicionar legenda..."
             className="flex-1 rounded-xl border border-border bg-muted px-4 py-2.5 text-sm text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-primary/50"
           />
         )}
