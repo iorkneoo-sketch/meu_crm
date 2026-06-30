@@ -63,6 +63,21 @@ const SECURITY_HEADERS = [
 const nextConfig: NextConfig = {
   output: "standalone",
   /**
+   * Baileys (@whiskeysockets/baileys) and its native/dynamic-require
+   * dependencies must NOT be bundled by Turbopack. When bundled, the
+   * library loses its internal module references and throws
+   * `Cannot read properties of undefined (reading 'me')` from inside
+   * its socket code, surfacing as an uncaughtException that can crash
+   * the server process. Marking them external makes Next require() them
+   * from node_modules at runtime instead.
+   */
+  serverExternalPackages: [
+    "@whiskeysockets/baileys",
+    "pino",
+    "sharp",
+    "jimp",
+  ],
+  /**
    * Cache-Control policy.
    *
    * Why this exists:
