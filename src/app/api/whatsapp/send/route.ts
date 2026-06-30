@@ -6,6 +6,8 @@ import {
   sendMediaMessage,
   type MediaKind,
 } from '@/lib/whatsapp/meta-api'
+import { MetaTransport } from '@/lib/whatsapp/meta-transport'
+import { QRTransport } from '@/lib/whatsapp/qr-transport-manager'
 import { decrypt, encrypt, isLegacyFormat } from '@/lib/whatsapp/encryption'
 import { supabaseAdmin } from '@/lib/flows/admin-client'
 import {
@@ -220,7 +222,7 @@ export async function POST(request: Request) {
       )
     }
 
-    // Fetch and decrypt WhatsApp config
+    // Fetch WhatsApp config
     const { data: config, error: configError } = await supabase
       .from('whatsapp_config')
       .select('*')
@@ -234,26 +236,21 @@ export async function POST(request: Request) {
       )
     }
 
-    const accessToken = decrypt(config.access_token)
-
-    // Self-heal legacy CBC-encrypted tokens. Fire-and-forget: we
-    // return from the send without waiting, so a failed upgrade just
-    // means the next send tries again. The upgrade is idempotent —
-    // concurrent sends both produce valid GCM ciphertexts of the same
-    // plaintext, last write wins.
-    if (isLegacyFormat(config.access_token)) {
-      void supabase
-        .from('whatsapp_config')
-        .update({ access_token: encrypt(accessToken) })
-        .eq('id', config.id)
-        .then(({ error }) => {
-          if (error) {
-            console.warn(
-              '[whatsapp/send] access_token GCM upgrade failed:',
-              error.message,
-            )
-          }
-        })
+    let accessToken = ''
+    if (config.provider !== 'qr') {
+      accessToken = decrypt(config.access_token)
+      // Self-heal legacy CBC-encrypted tokens.
+      if (isLegacyFormat(config.access_token)) {
+        void supabase
+          .from('whatsapp_config')
+          .update({ access_token: encrypt(accessToken) })
+          .eq('id', config.id)
+          .then(({ error }) => {
+            if (error) {
+              console.warn('[whatsapp/send] access_token GCM upgrade failed:', error.message)
+            }
+          })
+      }
     }
 
     // Resolve the reply target (if any) to its Meta message_id, which is
@@ -327,6 +324,18 @@ export async function POST(request: Request) {
     }
 
     const attempt = async (phone: string): Promise<string> => {
+      if (config.provider === 'qr') {
+        const transport = new QRTransport(accountId)
+        if (message_type === 'template') {
+          throw new Error('Templates not supported on QR provider')
+        }
+        if (isMediaKind) {
+          const result = await transport.sendMedia({ to: phone, kind: message_type, link: media_url, caption: content_text })
+          return result.messageId
+        }
+        const result = await transport.sendText({ to: phone, text: content_text })
+        return result.messageId
+      }
       if (message_type === 'template') {
         const result = await sendTemplateMessage({
           phoneNumberId: config.phone_number_id,

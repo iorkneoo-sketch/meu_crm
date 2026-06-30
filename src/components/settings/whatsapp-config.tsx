@@ -29,6 +29,7 @@ import {
   AccordionContent,
 } from '@/components/ui/accordion';
 import type { WhatsAppConfig as WhatsAppConfigType } from '@/types';
+import { WhatsAppQRConfig } from '@/components/settings/whatsapp-qr-config';
 
 const MASKED_TOKEN = '••••••••••••••••';
 
@@ -59,6 +60,7 @@ export function WhatsAppConfig() {
   const [accessToken, setAccessToken] = useState('');
   const [verifyToken, setVerifyToken] = useState('');
   const [pin, setPin] = useState('');
+  const [provider, setProvider] = useState<'meta' | 'qr'>('meta');
   const [tokenEdited, setTokenEdited] = useState(false);
 
   // True once /register has succeeded on Meta's side (timestamp set
@@ -106,6 +108,7 @@ export function WhatsAppConfig() {
 
       if (data) {
         setConfig(data);
+        setProvider((data.provider as 'meta' | 'qr') || 'meta');
         setPhoneNumberId(data.phone_number_id || '');
         setWabaId(data.waba_id || '');
         setAccessToken(MASKED_TOKEN);
@@ -381,6 +384,34 @@ export function WhatsAppConfig() {
         title="WhatsApp connection"
         description="Connect your Meta WhatsApp Business API. Credentials, webhook, and setup steps all live here."
       />
+
+      {/* Provider tabs */}
+      <div className="mb-6 flex gap-1 rounded-lg border border-border bg-muted/40 p-1">
+        <button
+          onClick={() => setProvider('meta')}
+          className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+            provider === 'meta'
+              ? 'bg-card text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          API Oficial (Meta)
+        </button>
+        <button
+          onClick={() => setProvider('qr')}
+          className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+            provider === 'qr'
+              ? 'bg-card text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          QR Code (Não-oficial)
+        </button>
+      </div>
+
+      {provider === 'qr' ? (
+        <WhatsAppQRConfig />
+      ) : (
       <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
       {/* Main config form */}
       <div className="space-y-6">
@@ -841,6 +872,7 @@ export function WhatsAppConfig() {
         </Card>
       </div>
     </div>
+      )}
     </section>
   );
 }
