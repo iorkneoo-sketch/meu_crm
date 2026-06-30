@@ -33,13 +33,22 @@ export function WhatsAppQRConfig() {
   const handleConnect = async () => {
     setLoading(true)
     try {
-      await fetch('/api/whatsapp/qr', {
+      const res = await fetch('/api/whatsapp/qr', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'connect' }),
       })
+      if (!res.ok) {
+        const err = await res.json()
+        console.error('[QR] Connect error:', err)
+        alert('Erro ao conectar: ' + (err.error || 'Verifique o console'))
+        return
+      }
       setTimeout(fetchStatus, 2000)
-    } catch { }
+    } catch (err) {
+      console.error('[QR] Connect error:', err)
+      alert('Erro de rede ao conectar. Verifique o ENCRYPTION_KEY.')
+    }
     setLoading(false)
   }
 

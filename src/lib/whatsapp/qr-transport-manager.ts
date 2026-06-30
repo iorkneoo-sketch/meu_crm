@@ -8,7 +8,7 @@ import { Boom } from '@hapi/boom'
 import pino from 'pino'
 import type { WhatsAppTransport, SendResult } from '@/lib/whatsapp/transport-types'
 import { encrypt, decrypt } from '@/lib/whatsapp/encryption'
-import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
@@ -32,27 +32,33 @@ function makeSocket(accountId: string, authState: { state: unknown; saveCreds: (
     markOnlineOnConnect: true,
   })
 
+  async function upsertConfig(accountId: string, values: Record<string, unknown>) {
+    const supabase = createServiceClient()
+    const { data: existing } = await supabase
+      .from('whatsapp_config')
+      .select('account_id')
+      .eq('account_id', accountId)
+      .maybeSingle()
+    if (existing) {
+      await supabase.from('whatsapp_config').update(values).eq('account_id', accountId)
+    } else {
+      await supabase.from('whatsapp_config').insert({ account_id: accountId, provider: 'qr', ...values })
+    }
+  }
+
   sock.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect, qr } = update
     const session = sessions.get(accountId)
     if (!session) return
 
     if (qr) {
-      const supabase = await createClient()
-      await supabase
-        .from('whatsapp_config')
-        .update({ qr_code: qr, connection_status: 'connecting' })
-        .eq('account_id', accountId)
+      await upsertConfig(accountId, { qr_code: qr, connection_status: 'connecting' })
     }
 
     if (connection === 'close') {
       const shouldReconnect = (lastDisconnect?.error as Boom)?.output?.statusCode !== DisconnectReason.loggedOut
       session.status = 'disconnected'
-      const supabase = await createClient()
-      await supabase
-        .from('whatsapp_config')
-        .update({ connection_status: 'disconnected' })
-        .eq('account_id', accountId)
+      await upsertConfig(accountId, { connection_status: 'disconnected' })
       if (shouldReconnect) {
         setTimeout(() => {
           const stored = sessions.get(accountId)
@@ -66,11 +72,7 @@ function makeSocket(accountId: string, authState: { state: unknown; saveCreds: (
 
     if (connection === 'open') {
       session.status = 'connected'
-      const supabase = await createClient()
-      await supabase
-        .from('whatsapp_config')
-        .update({ connection_status: 'connected', qr_code: null })
-        .eq('account_id', accountId)
+      await upsertConfig(accountId, { connection_status: 'connected', qr_code: null })
     }
   })
 
@@ -85,7 +87,7 @@ function makeSocket(accountId: string, authState: { state: unknown; saveCreds: (
       const text = msg.message?.conversation ||
         msg.message?.extendedTextMessage?.text ||
         ''
-      const supabase = await createClient()
+      const supabase = createServiceClient()
       const { data: configs } = await supabase
         .from('whatsapp_config')
         .select('account_id')
@@ -158,7 +160,7 @@ async function makeAuthState(credsJson: string | null) {
 
 export async function connectQR(accountId: string): Promise<void> {
   if (sessions.has(accountId)) return
-  const supabase = await createClient()
+  const supabase = createServiceClient()
   const { data: config } = await supabase
     .from('whatsapp_config')
     .select('auth_state')
@@ -177,11 +179,17 @@ export async function connectQR(accountId: string): Promise<void> {
     try {
       const saved = fs.readFileSync(path.join(authState.dir, 'creds.json'), 'utf-8')
       const encrypted = encrypt(saved)
-      const s = await createClient()
-      await s
+      const s = createServiceClient()
+      const { data: existing } = await s
         .from('whatsapp_config')
-        .update({ auth_state: encrypted })
+        .select('account_id')
         .eq('account_id', accountId)
+        .maybeSingle()
+      if (existing) {
+        await s.from('whatsapp_config').update({ auth_state: encrypted }).eq('account_id', accountId)
+      } else {
+        await s.from('whatsapp_config').insert({ account_id: accountId, provider: 'qr', auth_state: encrypted })
+      }
     } catch (err) {
       console.error('[QR] Failed to persist creds:', err)
     }
@@ -195,7 +203,7 @@ export async function disconnectQR(accountId: string): Promise<void> {
     session.socket.end(undefined)
     sessions.delete(accountId)
   }
-  const supabase = await createClient()
+  const supabase = createServiceClient()
   await supabase
     .from('whatsapp_config')
     .update({ connection_status: 'disconnected', qr_code: null })
