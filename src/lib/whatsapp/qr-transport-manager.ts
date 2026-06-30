@@ -40,9 +40,9 @@ function makeSocket(accountId: string, authState: { state: unknown; saveCreds: (
       .eq('account_id', accountId)
       .maybeSingle()
     if (existing) {
-      await supabase.from('whatsapp_config').update(values).eq('account_id', accountId)
+      await supabase.from('whatsapp_config').update(values as never).eq('account_id', accountId)
     } else {
-      await supabase.from('whatsapp_config').insert({ account_id: accountId, provider: 'qr', ...values })
+      await supabase.from('whatsapp_config').insert({ account_id: accountId, provider: 'qr', ...values } as never)
     }
   }
 
